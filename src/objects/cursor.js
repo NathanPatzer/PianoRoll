@@ -4,8 +4,10 @@ class Cursor extends Container {
 
   constructor(options = {}) {
     super();
-
-    this.speed = options.speed ?? 2;
+    this.cellWidth = options.cellWidth ?? 100;
+    this.bpm = options.bpm ?? 120;
+    const beatsPerSecond = this.bpm / 60;
+    this.speed = this.cellWidth * beatsPerSecond;
     this.screenHeight = options.height ?? window.innerHeight;
     this.isPaused = false;
 
@@ -32,10 +34,17 @@ class Cursor extends Container {
 
     this._setupDrag();
     this._setupPause();
+    this._updateCursorSpeed();
   }
 
   _setupPause() {
 
+  }
+
+  _updateCursorSpeed(cellWidth) {
+    if (!cellWidth) return;
+    const beatsPerSecond = this.bpm / 60; 
+    this.speed = cellWidth * beatsPerSecond;
   }
 
   _setupDrag() {
@@ -62,13 +71,12 @@ class Cursor extends Container {
     });
   }
 
-  update(delta) {
+  update(deltaMS) {
     if (this.isDragging || this.isPaused) return;
-
-    this.x += this.speed * delta;
+    this.x += (this.speed / 1000) * deltaMS;
 
     if (this.x > window.innerWidth) {
-      this.x = 0;
+        this.x = 0;
     }
   }
 }

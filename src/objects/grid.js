@@ -8,9 +8,9 @@ class Grid extends Container {
     this.screenHeight = options.height ?? window.innerHeight;
     this.cellWidth = options.cellWidth ?? options.cellSize ?? 50;
     this.cellHeight = options.cellHeight ?? options.cellSize ?? 50;
-    this.color = options.color ?? 0xffffff;
+    this.color = options.color ?? 0x000000;
     this.strokeWidth = options.strokeWidth ?? 1;
-    this.lineAlpha = options.lineAlpha ?? 1;
+    this.lineAlpha = options.lineAlpha ?? 1 ;
     this.octaves = options.octaves ?? 7;
     this._draw();
     this._setupInteraction();
@@ -19,13 +19,22 @@ class Grid extends Container {
   _draw() {
     this.removeChildren();
     const line = new Graphics();
-
+    const quarterNoteLine = new Graphics();
+    const measureLine = new Graphics();
     const totalHeight = this.octaves * 12 * this.cellHeight;
-
-    for (let column = 0; column <= this.screenWidth / this.cellWidth; column++) {
-        const x = column * this.cellWidth;
+    const quarterNoteWidth = this.cellWidth / 4; 
+    for (let column = 0; column <= this.screenWidth / quarterNoteWidth; column++) {
+      const x = column * quarterNoteWidth;
+      if (column % 16 === 0) {
+        measureLine.moveTo(x, 0).lineTo(x, totalHeight);
+      } 
+      else if (column % 4 === 0) {
         line.moveTo(x, 0).lineTo(x, totalHeight);
-    }
+      }
+      else {
+        quarterNoteLine.moveTo(x, 0).lineTo(x, totalHeight);
+      }
+    } 
 
     for (let row = 0; row <= this.octaves * 12; row++) {
       const y = row * this.cellHeight;
@@ -33,7 +42,11 @@ class Grid extends Container {
     }
 
     line.stroke({ width: this.strokeWidth, color: this.color, alpha: this.lineAlpha });
+    quarterNoteLine.stroke({ width: this.strokeWidth, color: this.color, alpha: this.lineAlpha / 2.5 });
+    measureLine.stroke({ width: this.strokeWidth * 2, color: this.color, alpha: this.lineAlpha * 1.5 });
+    this.addChild(quarterNoteLine);
     this.addChild(line);
+    this.addChild(measureLine);
   }
 
 _setupInteraction() {
@@ -46,11 +59,12 @@ _setupInteraction() {
       if (e.button !== 0) return;
 
       const local = this.toLocal(e.global);
-
-      const cellX = Math.floor(local.x / this.cellWidth);
+      var quarterNoteWidth = this.cellWidth / 4;
+      
+      const cellX = Math.floor(local.x / quarterNoteWidth);
       const cellY = Math.floor(local.y / this.cellHeight);
 
-      const pixelX = cellX * this.cellWidth;
+      const pixelX = cellX * quarterNoteWidth;
       const pixelY = cellY * this.cellHeight;
 
       this.emit('cellclick', { cellX, cellY, pixelX, pixelY });
@@ -58,11 +72,11 @@ _setupInteraction() {
 
     this.on('rightdown', (e) => {
       const local = this.toLocal(e.global);
-
-      const cellX = Math.floor(local.x / this.cellWidth);
+      var quarterNoteWidth = this.cellWidth / 4;
+      const cellX = Math.floor(local.x / quarterNoteWidth);
       const cellY = Math.floor(local.y / this.cellHeight);
 
-      const pixelX = cellX * this.cellWidth;
+      const pixelX = cellX * quarterNoteWidth;
       const pixelY = cellY * this.cellHeight;
 
       this.emit('cellrightclick', { cellX, cellY, pixelX, pixelY });

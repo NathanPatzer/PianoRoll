@@ -1,33 +1,34 @@
-import { Application, Assets, Sprite } from "pixi.js";
+import { Application, Container, Assets, Sprite } from "pixi.js";
 import Cursor from './objects/cursor.js';
 import Grid from './objects/grid.js';
 import Note from './objects/note.js';
 import { startAudio, stopAudio } from "./audio/audio.js";
 
 const app = new Application();
+const world = new Container();
 var notes = [];
 
 await app.init({ background: "#7c7cd1", resizeTo: window });
+app.stage.addChild(world);
 var previousGridWidth = app.screen.width;
 var previousGridHeight = app.screen.height;
 document.getElementById("pixi-container").appendChild(app.canvas);
-
+app.stage.sortableChildren = true;
 app.canvas.addEventListener('contextmenu', (e) => {
     e.preventDefault();
 });
 
-const cursor = new Cursor(app.screen.height);
+const grid = new Grid({ height: app.screen.height, width: app.screen.width, lineAlpha: 0.25 });
+grid.zIndex = 0;
+world.addChild(grid);
+
+const cursor = new Cursor({ cellWidth: grid.cellWidth, bpm: 120 });
 cursor.zIndex = 1;
 app.stage.addChild(cursor);
-
-const grid = new Grid({ height: app.screen.height, width: app.screen.width, lineAlpha: 0.15 });
-grid.zIndex = 0;
-app.stage.addChild(grid);
-
 app.ticker.add((time) => {
-  cursor.update(time.deltaTime);
+    cursor.update(time.deltaMS);
 });
-
+ 
 document.getElementById("play").addEventListener("click", startAudio);
 document.getElementById("stop").addEventListener("click", stopAudio);
 
@@ -40,6 +41,7 @@ document.getElementById('width-grid-slider').addEventListener('input', (e) => {
     note.x = cellX * grid.cellWidth;
     note.setNoteWidth(grid.cellWidth);
   }
+  cursor._updateCursorSpeed(grid.cellWidth);
 });
 
 document.getElementById('height-grid-slider').addEventListener('input', (e) => {
@@ -55,8 +57,8 @@ document.getElementById('height-grid-slider').addEventListener('input', (e) => {
 
 document.getElementById('temp-scroll').addEventListener('input', (e) => {
   const scrollValue = Number(e.target.value);
-  app.stage.y = -scrollValue;
-  cursor.y = app.screen.height - scrollValue;
+  world.y = -scrollValue;
+  //cursor.y = scrollValue;
 });
 
 grid.on('cellclick', (data) => {
@@ -70,9 +72,9 @@ grid.on('cellclick', (data) => {
   
   if (noteExists) return;
 
-  const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth, height: grid.cellHeight });
+  const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth / 4, height: grid.cellHeight });
   note.zIndex = 2;
-  app.stage.addChild(note);
+  world.addChild(note);
   notes.push(note);
 });
 
