@@ -1,0 +1,78 @@
+import { Container, Graphics } from 'pixi.js';
+
+class Cursor extends Container {
+
+  constructor(options = {}) {
+    super();
+
+    this.speed = options.speed ?? 2;
+    this.screenHeight = options.height ?? window.innerHeight;
+    this.isPaused = false;
+
+    this.graphic = new Graphics()
+      .moveTo(0, 0)
+      .lineTo(0, this.screenHeight)
+      .stroke({ width: 1, color: options.color ?? 0xffffff });
+
+    this.g = new Graphics();
+        this.g.poly([-10,0, 10,0, 0,10], true)
+        this.g.fill({ color: 0xffffff });
+
+    this.addChild(this.graphic);
+    this.addChild(this.g);
+
+    this.x = options.x ?? 0;
+    this.y = 0;
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        this.isPaused = !this.isPaused;
+      }
+    });
+
+    this._setupDrag();
+    this._setupPause();
+  }
+
+  _setupPause() {
+
+  }
+
+  _setupDrag() {
+    this.eventMode = 'static';
+    this.cursor = 'ew-resize';
+
+    // Expand hit area so it's easier to grab the thin line
+    this.hitArea = { x: -10, y: 0, width: 20, height: this.screenHeight,
+      contains(px, py) { return px >= this.x && px <= this.x + this.width && py >= this.y && py <= this.y + this.height; }
+    };
+
+    this.on('pointerdown', (e) => {
+      this.isDragging = true;
+      this.dragOffsetX = e.globalX - this.x;
+      e.stopPropagation();
+    });
+
+    // Listen on window so dragging outside the hit area still works
+    window.addEventListener('pointermove', (e) => {
+      if (!this.isDragging) return;
+      this.x = e.clientX - this.dragOffsetX;
+    });
+
+    window.addEventListener('pointerup', () => {
+      this.isDragging = false;
+    });
+  }
+
+  update(delta) {
+    if (this.isDragging || this.isPaused) return;
+
+    this.x += this.speed * delta;
+
+    if (this.x > window.innerWidth) {
+      this.x = 0;
+    }
+  }
+}
+
+export default Cursor;
