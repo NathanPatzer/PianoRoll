@@ -11,7 +11,7 @@ class Grid extends Container {
     this.color = options.color ?? 0xffffff;
     this.strokeWidth = options.strokeWidth ?? 1;
     this.lineAlpha = options.lineAlpha ?? 1;
-
+    this.octaves = options.octaves ?? 7;
     this._draw();
     this._setupInteraction();
   }
@@ -20,11 +20,15 @@ class Grid extends Container {
     this.removeChildren();
     const line = new Graphics();
 
-    for (let x = 0; x <= this.screenWidth; x += this.cellWidth) {
-      line.moveTo(x, 0).lineTo(x, this.screenHeight);
+    const totalHeight = this.octaves * 12 * this.cellHeight;
+
+    for (let column = 0; column <= this.screenWidth / this.cellWidth; column++) {
+        const x = column * this.cellWidth;
+        line.moveTo(x, 0).lineTo(x, totalHeight);
     }
 
-    for (let y = 0; y <= this.screenHeight; y += this.cellHeight) {
+    for (let row = 0; row <= this.octaves * 12; row++) {
+      const y = row * this.cellHeight;
       line.moveTo(0, y).lineTo(this.screenWidth, y);
     }
 
@@ -34,7 +38,9 @@ class Grid extends Container {
 
 _setupInteraction() {
     this.eventMode = 'static';
-    this.hitArea = new Rectangle(0, 0, this.screenWidth, this.screenHeight);
+    const totalHeight = this.octaves * 12 * this.cellHeight;
+    const totalWidth = this.screenWidth;
+    this.hitArea = new Rectangle(0, 0, this.screenWidth, totalHeight);
 
     this.on('pointerdown', (e) => {
       if (e.button !== 0) return;

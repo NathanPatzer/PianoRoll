@@ -53,6 +53,12 @@ document.getElementById('height-grid-slider').addEventListener('input', (e) => {
   }
 });
 
+document.getElementById('temp-scroll').addEventListener('input', (e) => {
+  const scrollValue = Number(e.target.value);
+  app.stage.y = -scrollValue;
+  cursor.y = app.screen.height - scrollValue;
+});
+
 grid.on('cellclick', (data) => {
   var noteExists = false;
   for (const note of notes) {
