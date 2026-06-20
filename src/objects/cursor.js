@@ -42,7 +42,6 @@ class Cursor extends Container {
     this.eventMode = 'static';
     this.cursor = 'ew-resize';
 
-    // Expand hit area so it's easier to grab the thin line
     this.hitArea = { x: -10, y: 0, width: 20, height: this.screenHeight,
       contains(px, py) { return px >= this.x && px <= this.x + this.width && py >= this.y && py <= this.y + this.height; }
     };
@@ -53,7 +52,6 @@ class Cursor extends Container {
       e.stopPropagation();
     });
 
-    // Listen on window so dragging outside the hit area still works
     window.addEventListener('pointermove', (e) => {
       if (!this.isDragging) return;
       this.x = e.clientX - this.dragOffsetX;

@@ -14,7 +14,6 @@ class Note extends Container {
         rect.rect(0, 0, this.noteWidth, this.noteHeight);
         rect.fill(this.color);
         this.addChild(rect);
-        this._setupInteraction();
     }
 
     setNoteWidth(width) {

@@ -54,8 +54,28 @@ document.getElementById('height-grid-slider').addEventListener('input', (e) => {
 });
 
 grid.on('cellclick', (data) => {
-    const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth, height: grid.cellHeight });
-    note.zIndex = 2;
-    app.stage.addChild(note);
-    notes.push(note);
+  var noteExists = false;
+  for (const note of notes) {
+    if (note.x === data.pixelX && note.y === data.pixelY) {
+      noteExists = true;
+      break;
+    }
+  }
+  
+  if (noteExists) return;
+
+  const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth, height: grid.cellHeight });
+  note.zIndex = 2;
+  app.stage.addChild(note);
+  notes.push(note);
+});
+
+grid.on('cellrightclick', (data) => {
+  for (const note of notes) {
+    if (note.x === data.pixelX && note.y === data.pixelY) {
+      note.destroy();
+      notes = notes.filter(n => n !== note);
+      break;
+    }
+  }
 });
