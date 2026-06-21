@@ -18,7 +18,7 @@ app.canvas.addEventListener('contextmenu', (e) => {
     e.preventDefault();
 });
 
-const grid = new Grid({ height: app.screen.height, width: app.screen.width, lineAlpha: 0.25, quantization: 4 });
+const grid = new Grid({ height: app.screen.height, width: app.screen.width, lineAlpha: 0.25, quantization: 8 });
 grid.zIndex = 0;
 world.addChild(grid);
 
@@ -58,7 +58,6 @@ document.getElementById('height-grid-slider').addEventListener('input', (e) => {
 document.getElementById('temp-scroll').addEventListener('input', (e) => {
   const scrollValue = Number(e.target.value);
   world.y = -scrollValue;
-  //cursor.y = scrollValue;
 });
 
 grid.on('cellclick', (data) => {
@@ -72,7 +71,7 @@ grid.on('cellclick', (data) => {
   
   if (noteExists) return;
 
-  const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth / 4, height: grid.cellHeight });
+  const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth / grid.quantization, height: grid.cellHeight });
   note.zIndex = 2;
   world.addChild(note);
   notes.push(note);

@@ -58,14 +58,13 @@ _setupInteraction() {
 
     this.on('pointerdown', (e) => {
       if (e.button !== 0) return;
-
       const local = this.toLocal(e.global);
-      var quarterNoteWidth = this.cellWidth / 4;
+      var noteWidth = this.cellWidth / this.quantization;
       
-      const cellX = Math.floor(local.x / quarterNoteWidth);
+      const cellX = Math.floor(local.x / noteWidth);
       const cellY = Math.floor(local.y / this.cellHeight);
 
-      const pixelX = cellX * quarterNoteWidth;
+      const pixelX = cellX * noteWidth;
       const pixelY = cellY * this.cellHeight;
 
       this.emit('cellclick', { cellX, cellY, pixelX, pixelY });
@@ -73,11 +72,11 @@ _setupInteraction() {
 
     this.on('rightdown', (e) => {
       const local = this.toLocal(e.global);
-      var quarterNoteWidth = this.cellWidth / 4;
-      const cellX = Math.floor(local.x / quarterNoteWidth);
+      var noteWidth = this.cellWidth / this.quantization;
+      const cellX = Math.floor(local.x / noteWidth);
       const cellY = Math.floor(local.y / this.cellHeight);
 
-      const pixelX = cellX * quarterNoteWidth;
+      const pixelX = cellX * noteWidth;
       const pixelY = cellY * this.cellHeight;
 
       this.emit('cellrightclick', { cellX, cellY, pixelX, pixelY });
