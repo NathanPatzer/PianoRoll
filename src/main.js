@@ -72,7 +72,7 @@ grid.on('cellclick', (data) => {
   
   if (noteExists) return;
 
-  const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth / grid.quantization, height: grid.cellHeight });
+  const note = new Note({ x: data.pixelX, y: data.pixelY, width: grid.cellWidth / grid.quantization, height: grid.cellHeight, quantization: grid.quantization });
   note.zIndex = 2;
   world.addChild(note);
   notes.push(note);
