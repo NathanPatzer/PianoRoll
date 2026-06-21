@@ -5,6 +5,7 @@ class Grid extends Container {
   constructor(options = {}) {
     super();
     this.screenWidth = options.width ?? window.innerWidth;
+    this.quantization = options.quantization ?? 4;
     this.screenHeight = options.height ?? window.innerHeight;
     this.cellWidth = options.cellWidth ?? options.cellSize ?? 50;
     this.cellHeight = options.cellHeight ?? options.cellSize ?? 50;
@@ -19,20 +20,20 @@ class Grid extends Container {
   _draw() {
     this.removeChildren();
     const line = new Graphics();
-    const quarterNoteLine = new Graphics();
+    const noteLine = new Graphics();
     const measureLine = new Graphics();
     const totalHeight = this.octaves * 12 * this.cellHeight;
-    const quarterNoteWidth = this.cellWidth / 4; 
-    for (let column = 0; column <= this.screenWidth / quarterNoteWidth; column++) {
-      const x = column * quarterNoteWidth;
-      if (column % 16 === 0) {
+    const noteWidth = this.cellWidth / this.quantization; 
+    for (let column = 0; column <= this.screenWidth / noteWidth; column++) {
+      const x = column * noteWidth;
+      if (column % (this.quantization * 4) === 0) {
         measureLine.moveTo(x, 0).lineTo(x, totalHeight);
       } 
-      else if (column % 4 === 0) {
+      else if (column % this.quantization === 0) {
         line.moveTo(x, 0).lineTo(x, totalHeight);
       }
       else {
-        quarterNoteLine.moveTo(x, 0).lineTo(x, totalHeight);
+        noteLine.moveTo(x, 0).lineTo(x, totalHeight);
       }
     } 
 
@@ -42,9 +43,9 @@ class Grid extends Container {
     }
 
     line.stroke({ width: this.strokeWidth, color: this.color, alpha: this.lineAlpha });
-    quarterNoteLine.stroke({ width: this.strokeWidth, color: this.color, alpha: this.lineAlpha / 2.5 });
+    noteLine.stroke({ width: this.strokeWidth, color: this.color, alpha: this.lineAlpha / 2.5 });
     measureLine.stroke({ width: this.strokeWidth * 2, color: this.color, alpha: this.lineAlpha * 1.5 });
-    this.addChild(quarterNoteLine);
+    this.addChild(noteLine);
     this.addChild(line);
     this.addChild(measureLine);
   }

@@ -18,7 +18,7 @@ app.canvas.addEventListener('contextmenu', (e) => {
     e.preventDefault();
 });
 
-const grid = new Grid({ height: app.screen.height, width: app.screen.width, lineAlpha: 0.25 });
+const grid = new Grid({ height: app.screen.height, width: app.screen.width, lineAlpha: 0.25, quantization: 4 });
 grid.zIndex = 0;
 world.addChild(grid);
 
