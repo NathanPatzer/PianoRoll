@@ -10,8 +10,6 @@ var notes = [];
 
 await app.init({ background: "#7c7cd1", resizeTo: window });
 app.stage.addChild(world);
-var previousGridWidth = app.screen.width;
-var previousGridHeight = app.screen.height;
 document.getElementById("pixi-container").appendChild(app.canvas);
 app.stage.sortableChildren = true;
 app.canvas.addEventListener('contextmenu', (e) => {
@@ -33,23 +31,26 @@ document.getElementById("play").addEventListener("click", startAudio);
 document.getElementById("stop").addEventListener("click", stopAudio);
 
 document.getElementById('width-grid-slider').addEventListener('input', (e) => {
-  previousGridWidth = grid.cellWidth;
-  const deltaWidth = Number(e.target.value) - previousGridWidth;
+  const oldNoteWidth = grid.cellWidth / grid.quantization;
+
   grid.setCellWidth(Number(e.target.value));
+  
+  const newNoteWidth = grid.cellWidth / grid.quantization;
+
   for (const note of notes) {
-    const cellX = Math.floor(note.x / previousGridWidth);
-    note.x = cellX * grid.cellWidth;
-    note.setNoteWidth(grid.cellWidth);
+    const cellX = Math.floor(note.x / oldNoteWidth);
+    note.x = cellX * newNoteWidth;
+    note.setNoteWidth(newNoteWidth);
   }
+
   cursor._updateCursorSpeed(grid.cellWidth);
 });
 
 document.getElementById('height-grid-slider').addEventListener('input', (e) => {
-  previousGridHeight = grid.cellHeight;
-  const deltaHeight = Number(e.target.value) - previousGridHeight;
+  const gridHeight = grid.cellHeight;
   grid.setCellHeight(Number(e.target.value));
   for (const note of notes) {
-    const cellY = Math.floor(note.y / previousGridHeight);
+    const cellY = Math.floor(note.y / gridHeight);
     note.y = cellY * grid.cellHeight;
     note.setNoteHeight(grid.cellHeight);
   }

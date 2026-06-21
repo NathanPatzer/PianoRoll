@@ -13,6 +13,7 @@ class Grid extends Container {
     this.strokeWidth = options.strokeWidth ?? 1;
     this.lineAlpha = options.lineAlpha ?? 1 ;
     this.octaves = options.octaves ?? 7;
+    this.pointerDown = false;
     this._draw();
     this._setupInteraction();
   }
@@ -58,9 +59,28 @@ _setupInteraction() {
 
     this.on('pointerdown', (e) => {
       if (e.button !== 0) return;
+      this.pointerDown = true;
       const local = this.toLocal(e.global);
       var noteWidth = this.cellWidth / this.quantization;
       
+      const cellX = Math.floor(local.x / noteWidth);
+      const cellY = Math.floor(local.y / this.cellHeight);
+
+      const pixelX = cellX * noteWidth;
+      const pixelY = cellY * this.cellHeight;
+
+      this.emit('cellclick', { cellX, cellY, pixelX, pixelY });
+    });
+
+    this.on('pointerup', (e) => {
+      if (e.button !== 0) return;
+      this.pointerDown = false;
+    });
+
+    this.on('pointermove', (e) => {
+      if (!this.pointerDown) return;
+      const local = this.toLocal(e.global);
+      var noteWidth = this.cellWidth / this.quantization;
       const cellX = Math.floor(local.x / noteWidth);
       const cellY = Math.floor(local.y / this.cellHeight);
 
