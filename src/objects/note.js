@@ -25,13 +25,10 @@ class Note extends Container {
     }
 
     setNoteWidth(width) {
-        this.noteWidth = width;
+        var noteLength = Math.round(this.noteWidth / this.quantizedNoteWidth);
+        var newWidth = width * noteLength;
         this.quantizedNoteWidth = width;
-        this.removeChildren();
-        const rect = new Graphics();
-        rect.rect(0, 0, this.noteWidth, this.noteHeight);
-        rect.fill(this.color);
-        this.addChild(rect);
+        this._reDraw(newWidth, this.noteHeight);
     }
 
     setQuantization(quantization) {
@@ -39,19 +36,15 @@ class Note extends Container {
     }
 
     setNoteHeight(height) {
-        this.noteHeight = height;
-        this.removeChildren();
-        const rect = new Graphics();
-        rect.rect(0, 0, this.noteWidth, this.noteHeight);
-        rect.fill(this.color);
-        this.addChild(rect);
+        this._reDraw(this.noteWidth, height);
     }
 
-    _reDraw(newWidth) {
+    _reDraw(newWidth, newHeight) {
         this.removeChildren();
         const rect = new Graphics();
-        this.hitArea = new Rectangle(0, 0, newWidth, this.noteHeight);
+        this.hitArea = new Rectangle(0, 0, newWidth, newHeight);
         this.noteWidth = newWidth;
+        this.noteHeight = newHeight;
         rect.rect(0, 0, this.noteWidth, this.noteHeight);
         rect.fill(this.color);
         this.addChild(rect);
@@ -79,7 +72,7 @@ class Note extends Container {
                     const newWidth = Math.max(this.quantizedNoteWidth, snappedDx);
 
                     if (newWidth !== this.noteWidth) {
-                        this._reDraw(newWidth);
+                        this._reDraw(newWidth, this.noteHeight);
                     }
                 }
                 else if ((this.resizingLeft || nearLeftEdge) && !this.resizingRight && !this.moving) {
@@ -91,7 +84,7 @@ class Note extends Container {
                     if (newWidth !== this.noteWidth) {
                         const widthDelta = newWidth - this.noteWidth;
                         this.x -= widthDelta;
-                        this._reDraw(newWidth);
+                        this._reDraw(newWidth, this.noteHeight);
                     }
                 }
                 else if ((!this.resizingRight && !this.resizingLeft) || this.moving) {
@@ -122,14 +115,6 @@ class Note extends Container {
 
         this.on('pointerdown', (e) => {
             this.pointerdown = true;
-            const local = this.toLocal(e.global);
-            const nearRightEdge = local.x >= this.noteWidth - EDGE_THRESHOLD;
-
-            if (nearRightEdge) {
-                // handle resize
-            } else {
-                // handle drag/click
-            }
         });
 
         this.on('pointerupoutside', (e) => {
