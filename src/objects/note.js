@@ -89,32 +89,19 @@ class Note extends Container {
                 }
                 else if ((!this.resizingRight && !this.resizingLeft) || this.moving) {
                     this.moving = true;
-                    if (this.moveStartX === undefined) {
-                        this.moveStartX = local.x;
-                    }
+                    const parentPos = this.parent.toLocal(e.global);
 
-                    if (this.moveStartY === undefined) {
-                        this.moveStartY = local.y;
-                    }
-                    const dx = local.x - this.moveStartX;
-                    const dy = local.y - this.moveStartY;
-                    if (Math.abs(dx) >= this.quantizedNoteWidth) {
-                        this.moveStartX = undefined;
-                        var moveDir = dx > 0 ? 1 : -1;
-                        this.x += this.quantizedNoteWidth * moveDir;
-                    }
-
-                    if (Math.abs(dy) >= this.noteHeight) {
-                        this.moveStartY = undefined;
-                        var moveDirY = dy > 0 ? 1 : -1;
-                        this.y += this.noteHeight * moveDirY;
-                    }
+                    this.x = Math.round((parentPos.x - this.dragOffsetX) / this.quantizedNoteWidth) * this.quantizedNoteWidth;
+                    this.y = Math.round((parentPos.y - this.dragOffsetY) / this.noteHeight) * this.noteHeight;
                 }
             }
         });
 
         this.on('pointerdown', (e) => {
             this.pointerdown = true;
+            const parentPos = this.parent.toLocal(e.global);
+            this.dragOffsetX = parentPos.x - this.x;
+            this.dragOffsetY = parentPos.y - this.y;
         });
 
         this.on('pointerupoutside', (e) => {
@@ -124,6 +111,8 @@ class Note extends Container {
             this.moving = false;
             this.moveStartX = undefined;
             this.moveStartY = undefined;
+            this.dragOffsetX = undefined;
+            this.dragOffsetY = undefined;
         });
 
         this.on('pointerup', (e) => {
@@ -133,6 +122,8 @@ class Note extends Container {
             this.moving = false;
             this.moveStartX = undefined;
             this.moveStartY = undefined;
+            this.dragOffsetX = undefined;
+            this.dragOffsetY = undefined;
         });
     }
 }
